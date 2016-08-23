@@ -2,6 +2,7 @@ var show_color_names = false
 var cm_to_pixels = 3
 var seam = 2
 var summary = []
+var tiling_history = []
 var colors = [
 	{
 		"color": "#FFFFFF",
@@ -172,7 +173,6 @@ var colors = [
 		"normal_chance_top_limit": 0
 	}
 ]
-var history = []
 
 function update_chance(name, val) {
 	for (var i = 0; i < colors.length; i++) {
@@ -278,7 +278,7 @@ function make_tiling(){
 	var seam_styles = 'margin-left: ' + seam + 'px; margin-top: ' + seam + 'px;'
 	var html = '<div class="wall" id="wall_1" style="width: ' + wall_width + 'px; height: ' + wall_height + 'px;">'
 
-	history.push({
+	tiling_history.push({
 		"wall_w": wall_width,
 		"wall_h": wall_height,
 		"tile_w": tile_width,
@@ -286,7 +286,7 @@ function make_tiling(){
 		"seam": seam,
 		"colors": []
 	})
-	push_id = history.length-1
+	push_id = tiling_history.length-1
 	for (var i = 0; i <= tiles_by_h; i++) {
 		th = tile_height
 		if (i == tiles_by_h) {
@@ -300,7 +300,7 @@ function make_tiling(){
 			if(tw>0 && th>0) {
 				color = get_color()
 				add_color(color)
-				history[push_id].colors.push(color)
+				tiling_history[push_id].colors.push(color)
 				html += '<div class="tile" style="background: ' + color + '; width: ' + tw + 'px; height: ' + th + 'px; ' + seam_styles + '"></div>'
 			}
 		}
