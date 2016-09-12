@@ -1,6 +1,7 @@
 var show_color_names = false
 var cm_to_pixels = 3
 var seam = 2
+var seam_color
 var summary = []
 var tiling_history = []
 var colors = [
@@ -23,7 +24,7 @@ var colors = [
 		"normal_chance_top_limit": 0
 	},
 	{
-		"color": "#8080.185",
+		"color": "#808183",
 		"name": "графит",
 		"chance": 0.1,
 		"normal_chance_top_limit": 0
@@ -171,8 +172,15 @@ var colors = [
 		"name": "коричневый",
 		"chance": 1,
 		"normal_chance_top_limit": 0
+	},
+	{
+		"color": "#F7F6F5",
+		"name": "шовный цвет",
+		"chance": 0,
+		"normal_chance_top_limit": 0
 	}
 ]
+seam_color = colors[colors.length-1].color
 
 function update_chance(name, val) {
 	for (var i = 0; i < colors.length; i++) {
@@ -182,19 +190,40 @@ function update_chance(name, val) {
 	}
 }
 
-function render_colorpicker() {
-	html = '';
+function render_colorpicker(target, plus_allowed, show_color_names, selected_color) {
+	html = '<ul>';
 	for (var i = 0; i < colors.length; i++) {
-		html += '<li><div style="background: ' + colors[i].color + '">'
-		if(show_color_names) {
+		if(colors[i].color == selected_color)
+			is_selected = ' class="selected" '
+		else
+			is_selected = ''
+		html += '<li' + is_selected + '><div class="colorpicker_tile" style="background: ' + colors[i].color + '"><input type="hidden" name="color" value="' + i + '">'
+		if(show_color_names == 2) {
 			html += colors[i].name
 		} else {
 			html += '&nbsp;'
 		}
-		html += '</div></li>'
+		html += '</div>'
+		if(show_color_names == 1) {
+			html += colors[i].name
+		}
+		html += '</li>'
 	}
-	html += '<li><div style="background: #FFF">+</div></li>'
-	$("#main_colorpicker > ul").html(html)
+	if(plus_allowed)
+		html += '<li><div style="background: #FFF">+</div></li>'
+	html += "</ul>"
+	$(target).html(html)
+}
+
+function make_seam_picker(target) {
+	$('li', target).on("click", function () {
+		seam_color = colors[$("input[type=hidden]", this).val()].color
+		$(".seam_color, .wall").css("background-color", seam_color)
+
+		$('li', target).removeClass("selected")
+		$(this).addClass("selected")
+		close_popup(100)
+	})
 }
 
 function render_distribution_picker() {
@@ -246,16 +275,16 @@ function clear_summary() {
 
 function add_color(color) {
 	for (var i = 0; i < summary.length; i++) {
-		console.log(summary[i].color)
+		// console.log(summary[i].color)
 		if(summary[i].color == color)
 			summary[i].summary += 1
 	}
 }
 
 function render_summary() {
-	html = ""
+	html = "<div>"
 	for (var i = 0; i < summary.length; i++) {
-		html += '<div><div class="tile" style="background: ' + summary[i].color + '; width: ' + tw + 'px; height: ' + th + 'px;"></div>' + summary[i].name + ' — ' + summary[i].summary + '</div>'
+		html += '<div><div class="distribution_tile" style="background: ' + summary[i].color + ';"></div>' + summary[i].name + ' — ' + summary[i].summary + '</div>'
 	}
 	$("#sm").html(html)
 }
@@ -276,7 +305,7 @@ function make_tiling(){
 	var last_tile_h = (wall_height-seam) % (tile_height + seam) - seam
 
 	var seam_styles = 'margin-left: ' + seam + 'px; margin-top: ' + seam + 'px;'
-	var html = '<div class="wall" id="wall_1" style="width: ' + wall_width + 'px; height: ' + wall_height + 'px;">'
+	var html = '<div class="wall" id="wall_1" style="width: ' + wall_width + 'px; height: ' + wall_height + 'px; background-color: ' + seam_color + ';">'
 
 	tiling_history.push({
 		"wall_w": wall_width,
@@ -290,10 +319,10 @@ function make_tiling(){
 	for (var i = 0; i <= tiles_by_h; i++) {
 		th = tile_height
 		if (i == tiles_by_h) {
-			th = last_tile_h
+			var th = last_tile_h
 		}
 		for (var j = 0; j <= tiles_by_w; j++) {
-			tw = tile_width
+			var tw = tile_width
 			if (j == tiles_by_w) {
 				tw = last_tile_w
 			}
@@ -305,9 +334,22 @@ function make_tiling(){
 			}
 		}
 	}
-	html += '</div><div id="sm"></div>'
+	html += '</div><div id="sm" class="tiles_distribution_result"></div>'
 	$(".workspace").html(html)
-	render_summary()
+	render_summary(tile_width, tile_height)
+}
+
+function open_popup() { $(".popup-wrp").removeClass("dnone").show() }
+function close_popup(delay) {
+	$(".popup-wrp").delay(delay).fadeOut(200, function () { $(this).addClass("dnone") })
+	$(".popup-wrp > .popup_title").html("")
+	$(".popup-wrp > .popup_content").html("")
+}
+
+function render_color_selector() {
+	for (var i = 0; i < colors.length; i++) {
+		colors[i]
+	}
 }
 
 
@@ -317,7 +359,7 @@ $(document).ready(function (){
 
 
 
-render_colorpicker();
+render_colorpicker("#main_colorpicker", 1, 0, "");
 render_distribution_picker();
 
 $("body").on("input", ".distribution input[type=range]", function() {
@@ -334,6 +376,25 @@ $("body").on("input", ".distribution input[type=range]", function() {
 
 
 $("#generate").on("click", function () { make_tiling() })
+
+$(".seam_color").on("click", function () {
+	$(".popup > .popup_title").html("Цвет шва")
+	$(".popup > .popup_content").html('<div class="colorpicker"></div>')
+	render_colorpicker($(".popup > .popup_content > .colorpicker"), 0, 1, seam_color)
+	make_seam_picker($(".popup > .popup_content > .colorpicker"))
+	open_popup()
+})
+
+$(".popup-wrp").on("click", function (event) {
+	if($(event.target).hasClass("popup-wrp"))
+		close_popup()
+})
+
+$(".seam_size").on("input", function () {
+	console.log($(this).val()*0.1*cm_to_pixels)
+	seam = Math.ceil($(this).val()*0.1*cm_to_pixels)
+	console.log(seam)
+})
 
 make_tiling()
 

@@ -15,13 +15,7 @@
 <div class="sidebar-wrp">
 	<div class="sidebar">
 		<div class="sidebar-heading dnone">Цвет</div>
-		<div class="colorpicker dnone" id="main_colorpicker">
-			<ul>
-				<li><div style="background: #FAA">&nbsp;</div></li>
-				<li class="selected"><div style="background: #FAA">&nbsp;</div></li>
-				<li><div style="background: #FFF">+</div></li>
-			</ul>
-		</div>
+		<div class="colorpicker dnone" id="main_colorpicker"></div>
 		<br>
 
 		<div class="sidebar-heading">Распределение</div>
@@ -32,13 +26,19 @@
 
 		<div class="sidebar-heading">Размер плитки</div>
 		<div class="tile_size">
-			<input class="width" type="number" min="1" max="100" placeholder="ширина" value="20"></input> × <input class="height" type="number" min="1" max="100" placeholder="высота" value="20"></input>
+			<input class="width" type="number" min="1" max="100" placeholder="ширина" value="20"></input> × <input class="height" type="number" min="1" max="100" placeholder="высота" value="20"></input> см
+		</div>
+		<br>
+
+		<div class="sidebar-heading">Шов</div>
+		<div class="seam">
+			<div class="seam_color"><span>&#x25bc;</span></div> <input class="seam_size" type="number" min="0" max="100" placeholder="размер шва" value="2"></input> мм
 		</div>
 		<br>
 
 		<div class="sidebar-heading">Стены</div>
 		<div class="walls_size">
-			<input class="width" type="number" min="1" max="1000" placeholder="ширина" value="180"></input> × <input class="height" type="number" min="1" max="1000" placeholder="высота" value="180"></input>
+			<input class="width" type="number" min="1" max="1000" placeholder="ширина" value="40"></input> × <input class="height" type="number" min="1" max="1000" placeholder="высота" value="40"></input> см
 		</div>
 		<br>
 		<br>
@@ -48,6 +48,13 @@
 <div class="workspace-wrp">
 	<div class="workspace">
 		
+	</div>
+</div>
+<div class="popup-wrp dnone">
+	<div class="popup">
+		<h3 class="popup_title"></h3>
+		<hr>
+		<div class="popup_content"></div>
 	</div>
 </div>
 	</body>
